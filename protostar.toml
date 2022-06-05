@@ -1,0 +1,8 @@
+["protostar.config"]
+protostar_version = "0.2.1"
+
+["protostar.project"]
+libs_path = "lib"
+
+["protostar.contracts"]
+functional = ["./src/sphinx/functional.cairo"]
