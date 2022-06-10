@@ -10,5 +10,5 @@
 
 To install the library through protostar, you can just run the following command:
 ```console
-protostar install git@github.com:Th0rgal/sphinx
+protostar install https://github.com/Th0rgal/sphinx
 ```
