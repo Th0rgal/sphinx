@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <img src="/logo.svg?raw=true" alt="Sphinx" width="512">
+  <img src="/logo.webp?raw=true" alt="Sphinx" width="512">
   <br>
 </h1>
 
