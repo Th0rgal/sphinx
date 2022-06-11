@@ -11,7 +11,7 @@ namespace List:
         return _fold_left(func_pc, acc, arr_len, arr)
     end
 
-    func _fold_left{range_check_ptr}(func_pc : felt, acc : felt, arr_len : felt, arr : felt*) -> (
+    func _fold_left{range_check_ptr}(func_pc : felt*, acc : felt, arr_len : felt, arr : felt*) -> (
         acc : felt
     ):
         if arr_len == 0:
@@ -30,7 +30,7 @@ namespace List:
         return _exists(func_pc, arr_len, arr)
     end
 
-    func _exists{range_check_ptr}(func_pc : felt, arr_len : felt, arr : felt*) -> (acc : felt):
+    func _exists{range_check_ptr}(func_pc : felt*, arr_len : felt, arr : felt*) -> (acc : felt):
         if arr_len == 0:
             return (FALSE)
         end
@@ -49,7 +49,7 @@ namespace List:
         return _for_all(func_pc, arr_len, arr)
     end
 
-    func _for_all{range_check_ptr}(func_pc : felt, arr_len : felt, arr : felt*) -> (acc : felt):
+    func _for_all{range_check_ptr}(func_pc : felt*, arr_len : felt, arr : felt*) -> (acc : felt):
         if arr_len == 0:
             return (TRUE)
         end
