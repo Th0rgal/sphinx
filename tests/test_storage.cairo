@@ -27,3 +27,17 @@ func test_my_var{syscall_ptr : felt*, range_check_ptr, pedersen_ptr : HashBuilti
     assert storage_result = 'hello'
     return ()
 end
+
+@storage_var
+func example(id : felt) -> (amount : felt):
+end
+
+@view
+func test_example{syscall_ptr : felt*, range_check_ptr, pedersen_ptr : HashBuiltin*}():
+    alloc_locals
+    Storage.write(example.addr, 1, new (12345), 'hello')
+    let (result) = example.read(12345)
+    assert result = 'hello'
+
+    return ()
+end

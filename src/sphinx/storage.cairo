@@ -28,7 +28,7 @@ namespace Storage:
     ) -> (addr : felt):
         alloc_locals
         let (local func_pc) = get_label_location(storage_var)
-        _prepare_call(pedersen_ptr, range_check_ptr, 2, inputs + 2)
+        _prepare_call(pedersen_ptr, range_check_ptr, len_inputs, inputs + len_inputs)
         call abs func_pc  # removing alloc_locals by calling ap[11-6*2] ?
         ret
     end
