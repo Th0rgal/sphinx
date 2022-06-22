@@ -22,9 +22,15 @@ func test_dump_bits{
 
     let (output) = alloc()
     dump_bits(output, arr, 16, 0)
-
     # 0100100001100101
     assert [output] = 18533
+
+    #let (output) = alloc()
+    #%{ print("calling") %}
+    #dump_bits(output, arr, 31, 0)
+    # 0100100001100101011011000110110
+    # assert [output] = 0
+    #assert [output] = 607303222
 
     return ()
 end
