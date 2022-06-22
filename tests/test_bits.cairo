@@ -41,23 +41,50 @@ func test_extract{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
 
     # single word, no shift, custom len
     let (output) = alloc()
-    Bits.extract(input, output, 0, 16)
+    Bits.extract(input, 0, 16, output)
     # 01001000011001010000000000000000
     assert output[0] = 1214578688
 
     # single word, shift of 4, custom len
     let (output) = alloc()
-    Bits.extract(input, output, 4, 15)
+    Bits.extract(input, 4, 15, output)
     # 10000110010101100000000000000000
     assert output[0] = 2253783040
 
     # two words, no shift, len = two words
     let (output) = alloc()
-    Bits.extract(input, output, 0, 64)
+    Bits.extract(input, 0, 64, output)
     # 01001000011001010110110001101100
     assert output[0] = 1214606444
     # 01101111001000000111011101101111
     assert output[1] = 1864398703
+
+    return ()
+end
+
+@view
+func test_merge{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
+    alloc_locals
+    let (a) = alloc()
+    # 01101111001000000111011101101111
+    assert a[0] = 1864398703
+    # 01110010011011000110010000000000
+    assert a[1] = 1919706112
+    # 32+22=54
+    let a_nb_bits = 54
+
+    let (b) = alloc()
+    # 01101111001000000111011101101110
+    assert b[0] = 1864398702
+    # 31
+    let b_nb_bits = 31
+    # on va lui en bouffer 10, il doit donc rester 21 bits à écrire à partir de 10
+
+    let (c, c_bits) = Bits.merge(a, a_nb_bits, b, b_nb_bits)
+
+    assert c[0] = 1864398703
+    assert c[1] = 1919706556
+    assert c[2] = 2178791424
 
     return ()
 end

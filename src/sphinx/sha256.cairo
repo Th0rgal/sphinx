@@ -8,6 +8,7 @@ from starkware.cairo.common.math_cmp import is_le
 from starkware.cairo.common.memcpy import memcpy
 from starkware.cairo.common.bitwise import bitwise_and
 from starkware.cairo.common.alloc import alloc
+from src.sphinx.bits import Bits
 
 func sha256{
     syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, bitwise_ptr : BitwiseBuiltin*, range_check_ptr
@@ -67,8 +68,9 @@ func create_chunks{
     if test == TRUE:
         let (len_chunks : felt, chunks : felt**) = create_chunks(input, n_bits, n_bits)
         assert chunks[len_chunks] = chunk
-        dump_bits(chunk, input, n_bits - bits_prefix, bits_prefix)
         # copy bits from input shifted by bits_prefix (needs to move bits)
+        Bits.extract(input, bits_prefix, n_bits - bits_prefix, chunk)
+
         return (len_chunks + 1, chunks)
     end
 
