@@ -8,7 +8,7 @@ from starkware.cairo.common.alloc import alloc
 from src.sphinx.sha256 import create_chunks
 
 @view
-func test_create_single_chunk{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
+func test_create_single_chunk{range_check_ptr}():
     alloc_locals
     let (hello_world) = alloc()
     # 01101000 01100101 01101100 01101100
@@ -35,7 +35,7 @@ func test_create_single_chunk{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
 end
 
 @view
-func test_create_two_chunks{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
+func test_create_two_chunks{range_check_ptr}():
     alloc_locals
     let (phrase) = alloc()
 
@@ -86,7 +86,7 @@ func test_create_two_chunks{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
     return ()
 end
 
-func multiple_asserts{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(
+func multiple_asserts{range_check_ptr}(
     ptr : felt*, amount : felt, value : felt
 ):
     if amount == 0:

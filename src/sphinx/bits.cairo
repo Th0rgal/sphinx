@@ -7,7 +7,7 @@ from starkware.cairo.common.memcpy import memcpy
 from starkware.cairo.common.alloc import alloc
 
 namespace Bits:
-    func merge{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(
+    func merge{range_check_ptr}(
         a : felt*, a_nb_bits : felt, b : felt*, b_nb_bits : felt
     ) -> (merged : felt*, merged_nb_bits : felt):
         # b must not be null
@@ -40,7 +40,7 @@ namespace Bits:
         return (merged, a_nb_bits + b_nb_bits)
     end
 
-    func extract{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(
+    func extract{range_check_ptr}(
         input : felt*, start : felt, len : felt, output : felt*
     ) -> ():
         # Write len bits from input to output, starting at start.
@@ -82,7 +82,7 @@ namespace Bits:
         return extract(input, start + to_dump, len - to_dump, output + 1)
     end
 
-    func erase_last{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(word : felt, n : felt) -> (
+    func erase_last{range_check_ptr}(word : felt, n : felt) -> (
         word : felt
     ):
         # Erase the last n bits of number (and shift to the right).
@@ -98,7 +98,7 @@ namespace Bits:
         return (p)
     end
 
-    func erase_first{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(word : felt, n : felt) -> (
+    func erase_first{range_check_ptr}(word : felt, n : felt) -> (
         word : felt
     ):
         # Erase the first n bits of number (and shift to the left).
@@ -110,17 +110,17 @@ namespace Bits:
         # Returns:
         #    word: The word with the first n bits erased.
         alloc_locals
-        let (powed) = pow2(32 - n)
-        let (erased) = bitwise_and(word, powed - 1)
+        let (divisor) = pow2(32 - n)
+        let (_, r) = unsigned_div_rem(word, divisor)
         let (multiplicator) = pow2(n)
-        return (multiplicator * erased)
+        return (multiplicator * r)
     end
 
-    func pow2{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(exp : felt) -> (res : felt):
+    func pow2{range_check_ptr}(exp : felt) -> (res : felt):
         return _pow2(exp, 1)
     end
 
-    func _pow2{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(exp : felt, acc : felt) -> (
+    func _pow2{range_check_ptr}(exp : felt, acc : felt) -> (
         res : felt
     ):
         if exp == 0:

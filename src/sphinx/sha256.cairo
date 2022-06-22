@@ -10,9 +10,7 @@ from starkware.cairo.common.bitwise import bitwise_and
 from starkware.cairo.common.alloc import alloc
 from src.sphinx.bits import Bits
 
-func sha256{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(input : felt*, n_bits : felt) -> (
-    output : felt*
-):
+func sha256{range_check_ptr}(input : felt*, n_bits : felt) -> (output : felt*):
     # Computes SHA256 of 'input'. See https://en.wikipedia.org/wiki/SHA-2
     #
     # Parameters:
@@ -42,9 +40,9 @@ func sha256{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(input : felt*, n_bit
     return for_all_chunks(work, 0, chunks)
 end
 
-func create_chunks{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(
-    input : felt*, n_bits : felt, bits_prefix : felt
-) -> (len_chunks : felt, chunks : felt**):
+func create_chunks{range_check_ptr}(input : felt*, n_bits : felt, bits_prefix : felt) -> (
+    len_chunks : felt, chunks : felt**
+):
     # Creates an array of chunks of length 512 bits (16 32-bit words) from 'input'.
     #
     # Parameters:
@@ -122,7 +120,7 @@ func create_chunks{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(
     return (len_chunks + 1, chunks)
 end
 
-func append_zeros{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(ptr : felt*, amount : felt):
+func append_zeros{range_check_ptr}(ptr : felt*, amount : felt):
     if amount == 0:
         return ()
     end
@@ -130,36 +128,96 @@ func append_zeros{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(ptr : felt*, a
     return append_zeros(ptr + 1, amount - 1)
 end
 
-func for_all_chunks{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(
-    work : felt*, chunks_len : felt, chunks : felt**
-) -> (output : felt*):
+func for_all_chunks{range_check_ptr}(work : felt*, chunks_len : felt, chunks : felt**) -> (
+    output : felt*
+):
     if chunks_len == 0:
         return (work)
     end
     let chunk : felt* = [chunks]
-    # Initialize array of round constants (it would be cool to reuse it everytime)
-    let (updated_work : felt*) = process_chunk(
-        work,
-        64,
-        new (0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
-        0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
-        0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
-        0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
-        0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
-        0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
-        0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
-        0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2),
-    )
+    let (constants : felt*) = get_constants()
+    let (updated_work : felt*) = process_chunk(work, 64, constants)
     return for_all_chunks(updated_work, chunks_len - 1, chunks + 1)
 end
 
-func process_chunk{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(
-    work : felt*, constants_len : felt, constants : felt*
-) -> (output : felt*):
+func process_chunk{range_check_ptr}(work : felt*, constants_len : felt, constants : felt*) -> (
+    output : felt*
+):
     if constants_len == 0:
         return (work)
     end
 
     # todo: update work with [constants]
     return process_chunk(work, constants_len - 1, constants + 1)
+end
+
+func get_constants() -> (data : felt*):
+    let (data_address) = get_label_location(data_start)
+    return (data=cast(data_address, felt*))
+
+    data_start:
+    dw 0x428a2f98
+    dw 0x71374491
+    dw 0xb5c0fbcf
+    dw 0xe9b5dba5
+    dw 0x3956c25b
+    dw 0x59f111f1
+    dw 0x923f82a4
+    dw 0xab1c5ed5
+    dw 0xd807aa98
+    dw 0x12835b01
+    dw 0x243185be
+    dw 0x550c7dc3
+    dw 0x72be5d74
+    dw 0x80deb1fe
+    dw 0x9bdc06a7
+    dw 0xc19bf174
+    dw 0xe49b69c1
+    dw 0xefbe4786
+    dw 0x0fc19dc6
+    dw 0x240ca1cc
+    dw 0x2de92c6f
+    dw 0x4a7484aa
+    dw 0x5cb0a9dc
+    dw 0x76f988da
+    dw 0x983e5152
+    dw 0xa831c66d
+    dw 0xb00327c8
+    dw 0xbf597fc7
+    dw 0xc6e00bf3
+    dw 0xd5a79147
+    dw 0x06ca6351
+    dw 0x14292967
+    dw 0x27b70a85
+    dw 0x2e1b2138
+    dw 0x4d2c6dfc
+    dw 0x53380d13
+    dw 0x650a7354
+    dw 0x766a0abb
+    dw 0x81c2c92e
+    dw 0x92722c85
+    dw 0xa2bfe8a1
+    dw 0xa81a664b
+    dw 0xc24b8b70
+    dw 0xc76c51a3
+    dw 0xd192e819
+    dw 0xd6990624
+    dw 0xf40e3585
+    dw 0x106aa070
+    dw 0x19a4c116
+    dw 0x1e376c08
+    dw 0x2748774c
+    dw 0x34b0bcb5
+    dw 0x391c0cb3
+    dw 0x4ed8aa4a
+    dw 0x5b9cca4f
+    dw 0x682e6ff3
+    dw 0x748f82ee
+    dw 0x78a5636f
+    dw 0x84c87814
+    dw 0x8cc70208
+    dw 0x90befffa
+    dw 0xa4506ceb
+    dw 0xbef9a3f7
+    dw 0xc67178f2
 end

@@ -8,7 +8,7 @@ from starkware.cairo.common.alloc import alloc
 from src.sphinx.bits import Bits
 
 @view
-func test_erase_last{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
+func test_erase_last{range_check_ptr}():
     let (test) = Bits.erase_last(127, 3)
     assert test = 15
 
@@ -22,14 +22,14 @@ func test_erase_last{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
 end
 
 @view
-func test_erase_first{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
+func test_erase_first{range_check_ptr}():
     let (test) = Bits.erase_first(127, 28)
     assert test = 4026531840
     return ()
 end
 
 @view
-func test_extract{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
+func test_extract{range_check_ptr}():
     alloc_locals
     let (input) = alloc()
     # 01001000011001010110110001101100
@@ -63,7 +63,7 @@ func test_extract{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
 end
 
 @view
-func test_merge{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
+func test_merge{range_check_ptr}():
     alloc_locals
     let (a) = alloc()
     # 01101111001000000111011101101111
