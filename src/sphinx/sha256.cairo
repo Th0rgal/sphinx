@@ -54,99 +54,73 @@ func create_chunks{
 
     alloc_locals
 
-    if n_bits == bits_prefix:
-        let (chunks : felt**) = alloc()
-        return (0, chunks)
-    end
-
-    let (chunk : felt*) = alloc()
-
     # if that's the last chunk
-    # we need to append a single bit and the length as a 64 bit integer
+    # we need to append a single bit at 1, zeros and the length as a 64 bit integer
     # so that's 512-65=447 bits free
-    let (test) = is_le(n_bits - bits_prefix, 447)
-    if test == TRUE:
-        let (len_chunks : felt, chunks : felt**) = create_chunks(input, n_bits, n_bits)
-        assert chunks[len_chunks] = chunk
-        # copy bits from input shifted by bits_prefix (needs to move bits)
-        Bits.extract(input, bits_prefix, n_bits - bits_prefix, chunk)
+    let len = n_bits - bits_prefix
 
-        return (len_chunks + 1, chunks)
-    end
-
-    # if 448 <= n_bits-bits_prefix <= 511
-    let (test) = is_le(n_bits - bits_prefix, 511)
+    # n_bits-bits_prefix <= 511
+    let (test) = is_le(len, 511)
     if test == TRUE:
-        let (len_chunks : felt, chunks : felt**) = create_chunks(input, n_bits, n_bits)
-        return (len_chunks + 1, chunks)
+        let (msg : felt*) = alloc()
+        Bits.extract(input, bits_prefix, len, msg)
+
+        # one followed by 31 0
+        let (one : felt*) = alloc()
+        assert [one] = 2147483648
+
+        # we will bind it to get full words
+        let (full_words, _) = unsigned_div_rem(len, 32)
+        let size = (full_words + 1) * 32 - len
+        let (chunk : felt*, new_len : felt) = Bits.merge(msg, len, one, size)
+        let words_len = new_len / 32
+
+        let (test) = is_le(len, 447)
+        # if that's the last chunk
+        # we need to append 447-len '0' and len on 64 bits (2 felt words)
+        # so that's 512-65=447 bits free
+        if test == TRUE:
+            let zero_words = 14 - words_len
+            append_zeros(chunk + words_len, zero_words)
+            # now chunk is 448 bits long = 14 words
+            # todo: support > 32 bits longs size
+            # current maximum size = 2^33-1
+            # = 8589934591 bits ~= 8.6GB
+
+            assert chunk[14] = 0
+            assert chunk[15] = n_bits
+            let (chunks : felt**) = alloc()
+            assert chunks[0] = chunk
+            return (1, chunks)
+        else:
+            # here we can put 0 until the 512 bits and call it back for the next chunk (empty)
+            let zero_words = 16 - words_len
+            append_zeros(chunk + words_len, zero_words)
+            let (len_chunks : felt, chunks : felt**) = create_chunks(input, n_bits, n_bits)
+            assert chunks[len_chunks] = chunk
+            return (len_chunks + 1, chunks)
+        end
     end
 
     # if 512 <= n_bits
-    # 512/ 32 = 16
+    # 512/32 = 16
     let (len_chunks : felt, chunks : felt**) = create_chunks(input, n_bits, bits_prefix + 512)
+
+    let (chunk : felt*) = alloc()
+    Bits.extract(input, bits_prefix, 512, chunk)
+    assert chunks[len_chunks] = chunk
+
     return (len_chunks + 1, chunks)
 end
 
-func dump_bits{
+func append_zeros{
     syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, bitwise_ptr : BitwiseBuiltin*, range_check_ptr
-}(output : felt*, words : felt*, bits_len : felt, bits_prefix : felt) -> ():
-    alloc_locals
-    if bits_len == 0:
+}(ptr : felt*, amount : felt):
+    if amount == 0:
         return ()
     end
-
-    local to_dump
-    let (test) = is_le(bits_len, 32)
-    if test == TRUE:
-        to_dump = bits_len
-    else:
-        to_dump = 32
-    end
-    let (q, r) = unsigned_div_rem(bits_prefix, 32)
-    if r == 0:
-        let (powed) = pow(2, 32 - to_dump)
-        let (erased) = bitwise_and(words[q], (powed - 1) * powed)
-        assert [output] = erased / powed
-        return dump_bits(output + 1, words, bits_len - to_dump, bits_prefix + to_dump)
-    end
-
-    # copy the last 32-r bits of words[q] and r first bits of words[q+1]
-    let (_mask) = pow(2, 32 - r)
-
-    let (test) = is_le(to_dump, 32 - r)
-    if test == TRUE:
-        let (too_much : felt) = pow(2, 32 - r - to_dump)
-        let mask1 : felt = _mask - 1 - too_much
-        let (alone) = bitwise_and(words[q], mask1)
-        let alone_shifted = alone * _mask
-        assert [output] = alone_shifted
-        return dump_bits(output + 1, words, bits_len - to_dump, bits_prefix + to_dump)
-    end
-    let mask1 : felt = _mask - 1
-    let (left) = bitwise_and(words[q], mask1)
-    let left_shifted = left * _mask
-
-    let (right_shifted, _) = unsigned_div_rem(words[q + 1], _mask)
-
-    if to_dump == 32:
-        assert [output] = left_shifted + right_shifted
-        return dump_bits(output + 1, words, bits_len - 32, bits_prefix + 32)
-    end
-    let (_mask2) = pow(2, 32 - to_dump)
-    let (right) = bitwise_and(right_shifted, _mask2 - 1)
-    assert [output] = left_shifted + right
-    return dump_bits(output + 1, words, bits_len - 32, bits_prefix + 32)
-end
-
-func pow(base : felt, exp : felt) -> (res : felt):
-    return _pow(base, exp, 1)
-end
-
-func _pow(base : felt, exp : felt, acc : felt) -> (res : felt):
-    if exp == 0:
-        return (acc)
-    end
-    return _pow(base, exp - 1, base * acc)
+    assert [ptr] = 0
+    return append_zeros(ptr + 1, amount - 1)
 end
 
 func for_all_chunks{
