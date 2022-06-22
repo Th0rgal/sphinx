@@ -53,7 +53,6 @@ namespace Bits:
         if len == 0:
             return ()
         end
-
         alloc_locals
 
         let (test) = is_le(len, 32)
@@ -65,13 +64,13 @@ namespace Bits:
         end
 
         let (words_len, shift) = unsigned_div_rem(start, 32)
-
+        let (test2) = is_le(to_dump + shift, 32)
         # erase the shift first bits and move to the left
         let (left) = Bits.erase_first(input[words_len], shift)
         local right
-        if shift != 0:
+        if test2 == FALSE:
             # erase the shift last bits and move to the right
-            let (value) = Bits.erase_last(input[words_len], 32 - shift)
+            let (value) = Bits.erase_last(input[words_len + 1], 32 - shift)
             assert right = value
         else:
             assert right = 0

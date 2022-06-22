@@ -76,7 +76,7 @@ func test_merge{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
     let (b) = alloc()
     # 01101111001000000111011101101110
     assert b[0] = 1864398702
-    # 31
+    # 31 (last 0 doesn't count)
     let b_nb_bits = 31
     # on va lui en bouffer 10, il doit donc rester 21 bits à écrire à partir de 10
 
