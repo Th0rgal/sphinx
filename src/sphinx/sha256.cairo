@@ -10,9 +10,9 @@ from starkware.cairo.common.bitwise import bitwise_and
 from starkware.cairo.common.alloc import alloc
 from src.sphinx.bits import Bits
 
-func sha256{
-    syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, bitwise_ptr : BitwiseBuiltin*, range_check_ptr
-}(input : felt*, n_bits : felt) -> (output : felt*):
+func sha256{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(input : felt*, n_bits : felt) -> (
+    output : felt*
+):
     # Computes SHA256 of 'input'. See https://en.wikipedia.org/wiki/SHA-2
     #
     # Parameters:
@@ -42,9 +42,9 @@ func sha256{
     return for_all_chunks(work, 0, chunks)
 end
 
-func create_chunks{
-    syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, bitwise_ptr : BitwiseBuiltin*, range_check_ptr
-}(input : felt*, n_bits : felt, bits_prefix : felt) -> (len_chunks : felt, chunks : felt**):
+func create_chunks{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(
+    input : felt*, n_bits : felt, bits_prefix : felt
+) -> (len_chunks : felt, chunks : felt**):
     # Creates an array of chunks of length 512 bits (16 32-bit words) from 'input'.
     #
     # Parameters:
@@ -58,6 +58,15 @@ func create_chunks{
     # we need to append a single bit at 1, zeros and the length as a 64 bit integer
     # so that's 512-65=447 bits free
     let len = n_bits - bits_prefix
+
+    if len == 0:
+        let (chunks : felt**) = alloc()
+        let (chunk) = alloc()
+        assert chunk[15] = n_bits
+        assert chunks[0] = chunk
+        append_zeros(chunk, 15)
+        return (1, chunks)
+    end
 
     # n_bits-bits_prefix <= 511
     let (test) = is_le(len, 511)
@@ -113,9 +122,7 @@ func create_chunks{
     return (len_chunks + 1, chunks)
 end
 
-func append_zeros{
-    syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, bitwise_ptr : BitwiseBuiltin*, range_check_ptr
-}(ptr : felt*, amount : felt):
+func append_zeros{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(ptr : felt*, amount : felt):
     if amount == 0:
         return ()
     end
@@ -123,9 +130,9 @@ func append_zeros{
     return append_zeros(ptr + 1, amount - 1)
 end
 
-func for_all_chunks{
-    syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, bitwise_ptr : BitwiseBuiltin*, range_check_ptr
-}(work : felt*, chunks_len : felt, chunks : felt**) -> (output : felt*):
+func for_all_chunks{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(
+    work : felt*, chunks_len : felt, chunks : felt**
+) -> (output : felt*):
     if chunks_len == 0:
         return (work)
     end
@@ -146,9 +153,9 @@ func for_all_chunks{
     return for_all_chunks(updated_work, chunks_len - 1, chunks + 1)
 end
 
-func process_chunk{
-    syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, bitwise_ptr : BitwiseBuiltin*, range_check_ptr
-}(work : felt*, constants_len : felt, constants : felt*) -> (output : felt*):
+func process_chunk{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(
+    work : felt*, constants_len : felt, constants : felt*
+) -> (output : felt*):
     if constants_len == 0:
         return (work)
     end
