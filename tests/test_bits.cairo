@@ -8,22 +8,22 @@ from starkware.cairo.common.alloc import alloc
 from src.sphinx.bits import Bits
 
 @view
-func test_erase_last{range_check_ptr}():
-    let (test) = Bits.erase_last(127, 3)
+func test_rightshift{range_check_ptr}():
+    let (test) = Bits.rightshift(127, 3)
     assert test = 15
 
-    let (test) = Bits.erase_last(127, 4)
+    let (test) = Bits.rightshift(127, 4)
     assert test = 7
 
-    let (test) = Bits.erase_last(378837287, 9)
+    let (test) = Bits.rightshift(378837287, 9)
     assert test = 739916
 
     return ()
 end
 
 @view
-func test_erase_first{range_check_ptr}():
-    let (test) = Bits.erase_first(127, 28)
+func test_leftshift{range_check_ptr}():
+    let (test) = Bits.leftshift(127, 28)
     assert test = 4026531840
     return ()
 end

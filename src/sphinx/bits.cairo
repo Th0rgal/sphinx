@@ -7,9 +7,9 @@ from starkware.cairo.common.memcpy import memcpy
 from starkware.cairo.common.alloc import alloc
 
 namespace Bits:
-    func merge{range_check_ptr}(
-        a : felt*, a_nb_bits : felt, b : felt*, b_nb_bits : felt
-    ) -> (merged : felt*, merged_nb_bits : felt):
+    func merge{range_check_ptr}(a : felt*, a_nb_bits : felt, b : felt*, b_nb_bits : felt) -> (
+        merged : felt*, merged_nb_bits : felt
+    ):
         # b must not be null
         alloc_locals
         let (merged) = alloc()
@@ -32,7 +32,7 @@ namespace Bits:
         # this contains a_rest bits at the left
         let left = a[a_full_words]
         # this contains 32-a_rest bits at the right
-        let (right) = erase_last([b], a_rest)
+        let (right) = rightshift([b], a_rest)
         assert merged[a_full_words] = left + right
 
         let shift = 32 - a_rest
@@ -40,9 +40,7 @@ namespace Bits:
         return (merged, a_nb_bits + b_nb_bits)
     end
 
-    func extract{range_check_ptr}(
-        input : felt*, start : felt, len : felt, output : felt*
-    ) -> ():
+    func extract{range_check_ptr}(input : felt*, start : felt, len : felt, output : felt*) -> ():
         # Write len bits from input to output, starting at start.
         #
         # Parameters:
@@ -66,11 +64,11 @@ namespace Bits:
         let (words_len, shift) = unsigned_div_rem(start, 32)
         let (test2) = is_le(to_dump + shift, 32)
         # erase the shift first bits and move to the left
-        let (left) = Bits.erase_first(input[words_len], shift)
+        let (left) = Bits.leftshift(input[words_len], shift)
         local right
         if test2 == FALSE:
             # erase the shift last bits and move to the right
-            let (value) = Bits.erase_last(input[words_len + 1], 32 - shift)
+            let (value) = Bits.rightshift(input[words_len + 1], 32 - shift)
             assert right = value
         else:
             assert right = 0
@@ -82,9 +80,7 @@ namespace Bits:
         return extract(input, start + to_dump, len - to_dump, output + 1)
     end
 
-    func erase_last{range_check_ptr}(word : felt, n : felt) -> (
-        word : felt
-    ):
+    func rightshift{range_check_ptr}(word : felt, n : felt) -> (word : felt):
         # Erase the last n bits of number (and shift to the right).
         #
         # Parameters:
@@ -98,9 +94,7 @@ namespace Bits:
         return (p)
     end
 
-    func erase_first{range_check_ptr}(word : felt, n : felt) -> (
-        word : felt
-    ):
+    func leftshift{range_check_ptr}(word : felt, n : felt) -> (word : felt):
         # Erase the first n bits of number (and shift to the left).
         #
         # Parameters:
@@ -120,9 +114,7 @@ namespace Bits:
         return _pow2(exp, 1)
     end
 
-    func _pow2{range_check_ptr}(exp : felt, acc : felt) -> (
-        res : felt
-    ):
+    func _pow2{range_check_ptr}(exp : felt, acc : felt) -> (res : felt):
         if exp == 0:
             return (acc)
         end

@@ -23,21 +23,21 @@ func sha256{range_check_ptr}(input : felt*, n_bits : felt) -> (output : felt*):
     alloc_locals
 
     # Initialize hash values
-    let (work : felt*) = alloc()
-    assert work[0] = 0x6a09e667
-    assert work[1] = 0xbb67ae85
-    assert work[2] = 0x3c6ef372
-    assert work[3] = 0xa54ff53a
-    assert work[4] = 0x510e527f
-    assert work[5] = 0x9b05688c
-    assert work[6] = 0x1f83d9ab
-    assert work[7] = 0x5be0cd19
+    let (hash : felt*) = alloc()
+    assert hash[0] = 0x6a09e667
+    assert hash[1] = 0xbb67ae85
+    assert hash[2] = 0x3c6ef372
+    assert hash[3] = 0xa54ff53a
+    assert hash[4] = 0x510e527f
+    assert hash[5] = 0x9b05688c
+    assert hash[6] = 0x1f83d9ab
+    assert hash[7] = 0x5be0cd19
 
     # Pre-processing (Padding)
 
     let (len_chunks : felt, chunks : felt**) = create_chunks(input, n_bits, 0)
 
-    return for_all_chunks(work, 0, chunks)
+    return for_all_chunks(hash, 0, chunks)
 end
 
 func create_chunks{range_check_ptr}(input : felt*, n_bits : felt, bits_prefix : felt) -> (
@@ -128,27 +128,24 @@ func append_zeros{range_check_ptr}(ptr : felt*, amount : felt):
     return append_zeros(ptr + 1, amount - 1)
 end
 
-func for_all_chunks{range_check_ptr}(work : felt*, chunks_len : felt, chunks : felt**) -> (
+func for_all_chunks{range_check_ptr}(hash : felt*, chunks_len : felt, chunks : felt**) -> (
     output : felt*
 ):
     if chunks_len == 0:
-        return (work)
+        return (hash)
     end
-    let chunk : felt* = [chunks]
-    let (constants : felt*) = get_constants()
-    let (updated_work : felt*) = process_chunk(work, 64, constants)
-    return for_all_chunks(updated_work, chunks_len - 1, chunks + 1)
+    let chunk : felt* = chunks[chunks_len - 1]
+    let (updated_hash : felt*) = process_chunk(chunk, hash)
+    return for_all_chunks(updated_hash, chunks_len - 1, chunks)
 end
 
-func process_chunk{range_check_ptr}(work : felt*, constants_len : felt, constants : felt*) -> (
-    output : felt*
-):
-    if constants_len == 0:
-        return (work)
-    end
+func process_chunk{range_check_ptr}(chunk : felt*, hash : felt*) -> (output : felt*):
+    # todo: update hash with [constants]
 
-    # todo: update work with [constants]
-    return process_chunk(work, constants_len - 1, constants + 1)
+    let a = chunk[0]
+    %{ print("prefix:", ids.a) %}
+
+    return (hash)
 end
 
 func get_constants() -> (data : felt*):

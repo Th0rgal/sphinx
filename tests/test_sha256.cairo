@@ -5,7 +5,7 @@ from starkware.cairo.common.registers import get_label_location
 from starkware.cairo.common.invoke import invoke
 from starkware.cairo.common.alloc import alloc
 
-from src.sphinx.sha256 import create_chunks
+from src.sphinx.sha256 import create_chunks, sha256
 
 @view
 func test_create_single_chunk{range_check_ptr}():
@@ -86,9 +86,48 @@ func test_create_two_chunks{range_check_ptr}():
     return ()
 end
 
-func multiple_asserts{range_check_ptr}(
-    ptr : felt*, amount : felt, value : felt
-):
+@view
+func test_sha256{range_check_ptr}():
+    alloc_locals
+    alloc_locals
+    let (phrase) = alloc()
+
+    # 01110100 01101000 01101001 01110011
+    assert phrase[0] = 1952999795
+    # 00100000 01101001 01110011 00100000
+    assert phrase[1] = 543781664
+    # 01100001 01101110 00100000 01100101
+    assert phrase[2] = 1634607205
+    # 01111000 01100001 01101101 01110000
+    assert phrase[3] = 2019650928
+    # 01101100 01100101 00100000 01101101
+    assert phrase[4] = 1818566765
+    # 01100101 01110011 01110011 01100001
+    assert phrase[5] = 1702064993
+    # 01100111 01100101 00100000 01110111
+    assert phrase[6] = 1734680695
+    # 01101000 01101001 01100011 01101000
+    assert phrase[7] = 1751737192
+    # 00100000 01110011 01101000 01101111
+    assert phrase[8] = 544434287
+    # 01110101 01101100 01100100 00100000
+    assert phrase[9] = 1970037792
+    # 01110100 01100001 01101011 01100101
+    assert phrase[10] = 1952541541
+    # 00100000 01101101 01110101 01101100
+    assert phrase[11] = 544044396
+    # 01110100 01101001 01110000 01101100
+    assert phrase[12] = 1953067116
+    # 01100101 00100000 01100011 01101000
+    assert phrase[13] = 1696621416
+    # 01110101 01101110 01101011 01110011
+    assert phrase[14] = 1970170739
+
+    sha256(phrase, 480)
+    return ()
+end
+
+func multiple_asserts{range_check_ptr}(ptr : felt*, amount : felt, value : felt):
     if amount == 0:
         return ()
     end
