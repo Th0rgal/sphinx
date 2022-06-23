@@ -37,7 +37,7 @@ func sha256{range_check_ptr}(input : felt*, n_bits : felt) -> (output : felt*):
 
     let (len_chunks : felt, chunks : felt**) = create_chunks(input, n_bits, 0)
 
-    return for_all_chunks(hash, 0, chunks)
+    return for_all_chunks(hash, len_chunks, chunks)
 end
 
 func create_chunks{range_check_ptr}(input : felt*, n_bits : felt, bits_prefix : felt) -> (
@@ -140,12 +140,20 @@ func for_all_chunks{range_check_ptr}(hash : felt*, chunks_len : felt, chunks : f
 end
 
 func process_chunk{range_check_ptr}(chunk : felt*, hash : felt*) -> (output : felt*):
-    # todo: update hash with [constants]
-
-    let a = chunk[0]
-    %{ print("prefix:", ids.a) %}
+    # Extend the first 16 words into a total of 64 words
+    extend_words(chunk, 16)
 
     return (hash)
+end
+
+func extend_words{range_check_ptr}(chunk : felt*, i : felt) -> ():
+    #
+
+    if i == 64:
+        return ()
+    end
+
+    return ()
 end
 
 func get_constants() -> (data : felt*):
