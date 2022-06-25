@@ -151,16 +151,37 @@ func process_chunk{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(chunk : felt*
     # Extend the first 16 words into a total of 64 words
     compute_message_schedule(chunk)
     let (k : felt*) = get_constants()
-    let (updated_hash) = compute_compression(hash, chunk, k, 0)
-    return (updated_hash)
+    compute_compression(hash, chunk, k, 0)
+
+    let shifted_hash : felt* = hash + 8 * 64
+
+    # additions are mod 2^32
+    let (_, mod32bits) = unsigned_div_rem(hash[0] + shifted_hash[0], 4294967296)
+    assert shifted_hash[8] = mod32bits
+    let (_, mod32bits) = unsigned_div_rem(hash[1] + shifted_hash[1], 4294967296)
+    assert shifted_hash[9] = mod32bits
+    let (_, mod32bits) = unsigned_div_rem(hash[2] + shifted_hash[2], 4294967296)
+    assert shifted_hash[10] = mod32bits
+    let (_, mod32bits) = unsigned_div_rem(hash[3] + shifted_hash[3], 4294967296)
+    assert shifted_hash[11] = mod32bits
+    let (_, mod32bits) = unsigned_div_rem(hash[4] + shifted_hash[4], 4294967296)
+    assert shifted_hash[12] = mod32bits
+    let (_, mod32bits) = unsigned_div_rem(hash[5] + shifted_hash[5], 4294967296)
+    assert shifted_hash[13] = mod32bits
+    let (_, mod32bits) = unsigned_div_rem(hash[6] + shifted_hash[6], 4294967296)
+    assert shifted_hash[14] = mod32bits
+    let (_, mod32bits) = unsigned_div_rem(hash[7] + shifted_hash[7], 4294967296)
+    assert shifted_hash[15] = mod32bits
+
+    return (shifted_hash + 8)
 end
 
 func compute_compression{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(
     hash : felt*, w : felt*, k : felt*, index : felt
-) -> (updated_hash : felt*):
+):
     alloc_locals
     if index == 64:
-        return (hash - 8)
+        return ()
     end
 
     # s1 := (h4 rightrotate 6) xor (h4 rightrotate 11) xor (h4 rightrotate 25)
