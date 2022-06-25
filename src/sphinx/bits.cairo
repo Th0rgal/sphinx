@@ -127,6 +127,17 @@ namespace Bits:
         return (p + r * m)
     end
 
+    func negate{range_check_ptr}(word : felt) -> (word : felt):
+        # Negate bits (replace 1 by 0 and 0 by 1) of a 32-bits word
+        #
+        # Parameters:
+        #    word: A 32-bits word
+        #
+        # Returns:
+        #    word: The negated value
+        return (4294967295 - word)
+    end
+
     func pow2{range_check_ptr}(exp : felt) -> (res : felt):
         return _pow2(exp, 1)
     end

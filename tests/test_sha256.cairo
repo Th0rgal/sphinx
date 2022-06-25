@@ -87,7 +87,7 @@ func test_create_two_chunks{range_check_ptr}():
 end
 
 @view
-func test_sha256{range_check_ptr}():
+func test_sha256{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
     alloc_locals
     alloc_locals
     let (phrase) = alloc()
