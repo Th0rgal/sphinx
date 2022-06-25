@@ -81,33 +81,50 @@ namespace Bits:
     end
 
     func rightshift{range_check_ptr}(word : felt, n : felt) -> (word : felt):
-        # Erase the last n bits of number (and shift to the right).
+        # Shift bits to the right and lose values
         #
         # Parameters:
         #    word: A 32-bits word
-        #    n: The amount of bits to erase
+        #    n: The amount of bits to shift
         #
         # Returns:
-        #    word: The word with the last n bits erased.
+        #    word: The word with the last n bits shifted.
         let (divisor) = pow2(n)
         let (p, _) = unsigned_div_rem(word, divisor)
         return (p)
     end
 
     func leftshift{range_check_ptr}(word : felt, n : felt) -> (word : felt):
-        # Erase the first n bits of number (and shift to the left).
+        # Shift bits to the left and lose values
         #
         # Parameters:
         #    word: A 32-bits word
-        #    n: The amount of bits to erase
+        #    n: The amount of bits to shift
         #
         # Returns:
-        #    word: The word with the first n bits erased.
+        #    word: The word with the first n bits shifted.
         alloc_locals
         let (divisor) = pow2(32 - n)
         let (_, r) = unsigned_div_rem(word, divisor)
         let (multiplicator) = pow2(n)
         return (multiplicator * r)
+    end
+
+    func rightrotate{range_check_ptr}(word : felt, n : felt) -> (word : felt):
+        # Shift bits to the right and move values to the left
+        #
+        # Parameters:
+        #    word: A 32-bits word
+        #    n: The amount of bits to rotate
+        #
+        # Returns:
+        #    word: The word with the last n bits rotated.
+        alloc_locals
+        let (d) = pow2(n)
+        let (p, r) = unsigned_div_rem(word, d)
+        # %{ print("d:", ids.d, "p:", ids.p, "r:", ids.r) %}
+        let (m) = pow2(32 - n)
+        return (p + r * m)
     end
 
     func pow2{range_check_ptr}(exp : felt) -> (res : felt):

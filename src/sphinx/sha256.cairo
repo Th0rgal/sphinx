@@ -147,13 +147,16 @@ func process_chunk{range_check_ptr}(chunk : felt*, hash : felt*) -> (output : fe
 end
 
 func extend_words{range_check_ptr}(chunk : felt*, i : felt) -> ():
-    #
-
     if i == 64:
         return ()
     end
 
-    return ()
+    let min15 = chunk[i-15]
+    let min2 = chunk[i-2]
+    let min16 = chunk[i-16]
+    let min7 = chunk[i-7]
+
+    return extend_words(chunk, i + 1)
 end
 
 func get_constants() -> (data : felt*):

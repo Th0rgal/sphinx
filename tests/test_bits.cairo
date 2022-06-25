@@ -29,6 +29,15 @@ func test_leftshift{range_check_ptr}():
 end
 
 @view
+func test_rightrotate{range_check_ptr}():
+    let (test) = Bits.rightrotate(3, 1)
+    assert test = 2147483649
+    let (test) = Bits.rightrotate(1214606444, 7)
+    assert test = 2147483649
+    return ()
+end
+
+@view
 func test_extract{range_check_ptr}():
     alloc_locals
     let (input) = alloc()
