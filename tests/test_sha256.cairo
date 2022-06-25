@@ -89,7 +89,6 @@ end
 @view
 func test_sha256{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
     alloc_locals
-    alloc_locals
     let (phrase) = alloc()
     # phrase="this is an example message which should take multiple chunks"
     # 01110100 01101000 01101001 01110011
@@ -140,6 +139,32 @@ func test_sha256{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
     assert g = 3208491254
     let h = hash[7]
     assert h = 789740750
+
+    let (hello_world) = alloc()
+    # 01101000 01100101 01101100 01101100
+    assert hello_world[0] = 1751477356
+    # 01101111 00100000 01110111 01101111
+    assert hello_world[1] = 1864398703
+    # 01110010 01101100 01100100 ........
+    assert hello_world[2] = 1919706112
+
+    let (hash) = sha256(hello_world, 88)
+    let a = hash[0]
+    assert a = 3108841401
+    let b = hash[1]
+    assert b = 2471312904
+    let c = hash[2]
+    assert c = 2771276503
+    let d = hash[3]
+    assert d = 3665669114
+    let e = hash[4]
+    assert e = 3297046499
+    let f = hash[5]
+    assert f = 2052292846
+    let g = hash[6]
+    assert g = 2424895404
+    let h = hash[7]
+    assert h = 3807366633
 
     return ()
 end
