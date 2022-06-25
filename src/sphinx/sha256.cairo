@@ -162,7 +162,6 @@ func compute_compression{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(
     if index == 64:
         return (hash - 8)
     end
-    #%{ print("called, i=", ids.index) %}
 
     # s1 := (h4 rightrotate 6) xor (h4 rightrotate 11) xor (h4 rightrotate 25)
     let (a) = Bits.rightrotate(hash[4], 6)
@@ -179,7 +178,11 @@ func compute_compression{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(
     assert bitwise_ptr[2].x = hash[4]
     assert bitwise_ptr[2].y = hash[5]
     let a = bitwise_ptr[2].x_and_y
+
+    let hey = hash[4]
+    let hello = 4294967295 - hash[4]
     assert bitwise_ptr[3].x = 4294967295 - hash[4]
+
     assert bitwise_ptr[3].y = hash[6]
     let b = bitwise_ptr[3].x_and_y
     assert bitwise_ptr[4].x = a
@@ -217,11 +220,14 @@ func compute_compression{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(
     assert bitwise_ptr[11].y = c
     let maj : felt = bitwise_ptr[11].x_xor_y
 
-    assert hash[8] = temp1 + s0 + maj
+    # additions are mod 2^32
+    let (_, mod32bits) = unsigned_div_rem(temp1 + s0 + maj, 4294967296)
+    assert hash[8] = mod32bits
     assert hash[9] = hash[0]
     assert hash[10] = hash[1]
     assert hash[11] = hash[2]
-    assert hash[12] = hash[3] + temp1
+    let (_, mod32bits) = unsigned_div_rem(hash[3] + temp1, 4294967296)
+    assert hash[12] = mod32bits
     assert hash[13] = hash[4]
     assert hash[14] = hash[5]
     assert hash[15] = hash[6]
