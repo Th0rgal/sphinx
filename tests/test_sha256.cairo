@@ -10,6 +10,13 @@ from src.sphinx.sha256 import create_chunks, sha256
 @view
 func test_create_single_chunk{range_check_ptr}():
     alloc_locals
+    let (empty) = alloc()
+    let (len_chunks : felt, chunks : felt**) = create_chunks(empty, 0, 0)
+    assert len_chunks = 1
+    let chunk : felt* = chunks[0]
+    assert chunk[0] = 2147483648
+    multiple_asserts(chunk + 1, 15, 0)
+
     let (hello_world) = alloc()
     # 01101000 01100101 01101100 01101100
     assert hello_world[0] = 1751477356
@@ -165,6 +172,25 @@ func test_sha256{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
     assert g = 2424895404
     let h = hash[7]
     assert h = 3807366633
+
+    let (empty) = alloc()
+    let (hash) = sha256(empty, 0)
+    let a = hash[0]
+    assert a = 3820012610
+    let b = hash[1]
+    assert b = 2566659092
+    let c = hash[2]
+    assert c = 2600203464
+    let d = hash[3]
+    assert d = 2574235940
+    let e = hash[4]
+    assert e = 665731556
+    let f = hash[5]
+    assert f = 1687917388
+    let g = hash[6]
+    assert g = 2761267483
+    let h = hash[7]
+    assert h = 2018687061
 
     return ()
 end

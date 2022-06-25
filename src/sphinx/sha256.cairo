@@ -59,15 +59,6 @@ func create_chunks{range_check_ptr}(input : felt*, n_bits : felt, bits_prefix : 
     # so that's 512-65=447 bits free
     let len = n_bits - bits_prefix
 
-    if len == 0:
-        let (chunks : felt**) = alloc()
-        let (chunk) = alloc()
-        assert chunk[15] = n_bits
-        assert chunks[0] = chunk
-        append_zeros(chunk, 15)
-        return (1, chunks)
-    end
-
     # n_bits-bits_prefix <= 511
     let (test) = is_le(len, 511)
     if test == TRUE:
@@ -102,12 +93,16 @@ func create_chunks{range_check_ptr}(input : felt*, n_bits : felt, bits_prefix : 
             assert chunks[0] = chunk
             return (1, chunks)
         else:
-            # here we can put 0 until the 512 bits and call it back for the next chunk (empty)
+            # here we can put 0 until the 512 bits and get an empty next chunk
             let zero_words = 16 - words_len
             append_zeros(chunk + words_len, zero_words)
-            let (len_chunks : felt, chunks : felt**) = create_chunks(input, n_bits, n_bits)
-            assert chunks[len_chunks] = chunk
-            return (len_chunks + 1, chunks)
+            let (chunks : felt**) = alloc()
+            let (last_chunk) = alloc()
+            assert last_chunk[15] = n_bits
+            assert chunks[0] = last_chunk
+            append_zeros(last_chunk, 15)
+            assert chunks[1] = chunk
+            return (2, chunks)
         end
     end
 
