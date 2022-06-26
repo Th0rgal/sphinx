@@ -33,7 +33,7 @@ func test_rightrotate{range_check_ptr}():
     let (test) = Bits.rightrotate(3, 1)
     assert test = 2147483649
     let (test) = Bits.rightrotate(1214606444, 7)
-    assert test = 2147483649
+    assert test = 3633367768
     return ()
 end
 
