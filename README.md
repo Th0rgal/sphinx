@@ -18,6 +18,7 @@ Otherwise, you can just copy the files that you need.  You can do whatever you w
 # Features
 
 ## Functional
+File: ``functional.cairo``
 Some functions applying operations from other functions passed in parameter. They are inspired by the standard OCAML library.
 
 > note: new(x, y, z, ...) will create an array, [link to the docs](https://cairo-lang.org/docs/how_cairo_works/object_allocation.html#the-new-operator)
@@ -82,6 +83,7 @@ end
 ```
 
 ## Storage
+File: ``storage.cairo``
 Write to a storage_variable from its address. 
 
 ### Storage.write, Storage.read
@@ -109,6 +111,7 @@ end
 ```
 
 ## SHA256
+File: ``sha256.cairo``
 This file depends on bits.cairo. It allows to calculate the sha256 hash of an input of any size in bits.
 For example, sha256("hey guys") = "be83351937c9a13e0d0e16ae97ee46915e790cf9a5d55fa317014539009f2101"
 Which if broken down into 32-bit words, gives :
@@ -149,6 +152,7 @@ end
 ```
 
 ## Bits manipulation
+File: ``bits.cairo``
 This file allows to represent long lists of bits and to perform common operations on them. This list will be represented by a list of words (felts) each containing up to 32 bits, and a felt containing the total number of bits.
 
 ### Bits.extract
