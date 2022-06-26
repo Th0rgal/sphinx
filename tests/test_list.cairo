@@ -12,13 +12,7 @@ end
 
 @view
 func test_fold_left{syscall_ptr : felt*, range_check_ptr, pedersen_ptr : HashBuiltin*}():
-    let (arr : felt*) = alloc()
-    assert arr[0] = 5
-    assert arr[1] = 4
-    assert arr[2] = 3
-    assert arr[3] = 2
-    assert arr[4] = 1
-    let (result) = List.fold_left(sum, 0, 5, arr)
+    let (result) = List.fold_left(sum, 0, 5, new (5, 4, 3, 2, 1))
     assert result = 15
     return ()
 end
@@ -44,12 +38,7 @@ end
 @view
 func test_exists{syscall_ptr : felt*, range_check_ptr, pedersen_ptr : HashBuiltin*}():
     alloc_locals
-    let (arr : felt*) = alloc()
-    assert arr[0] = 5
-    assert arr[1] = 4
-    assert arr[2] = 3
-    assert arr[3] = 2
-    assert arr[4] = 1
+    let (arr : felt*) = new (5, 4, 3, 2, 1)
     let (result) = List.exists(is_10, 5, arr)
     assert result = FALSE
     let (result) = List.exists(is_4, 5, arr)
@@ -70,11 +59,7 @@ end
 func test_for_all{syscall_ptr : felt*, range_check_ptr, pedersen_ptr : HashBuiltin*}():
     alloc_locals
     let (arr : felt*) = alloc()
-    assert arr[0] = 5
-    assert arr[1] = 4
-    assert arr[2] = 3
-    assert arr[3] = 2
-    assert arr[4] = 1
+    let (arr : felt*) = new (5, 4, 3, 2, 1)
     let (result) = List.for_all(is_4, 5, arr)
     assert result = FALSE
     let (result) = List.for_all(is_not_10, 5, arr)
