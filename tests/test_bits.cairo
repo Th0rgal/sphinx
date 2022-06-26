@@ -87,7 +87,6 @@ func test_merge{range_check_ptr}():
     assert b[0] = 1864398702
     # 31 (last 0 doesn't count)
     let b_nb_bits = 31
-    # on va lui en bouffer 10, il doit donc rester 21 bits à écrire à partir de 10
 
     let (c, c_bits) = Bits.merge(a, a_nb_bits, b, b_nb_bits)
 

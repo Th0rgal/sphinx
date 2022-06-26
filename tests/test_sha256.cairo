@@ -192,6 +192,25 @@ func test_sha256{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
     let h = hash[7]
     assert h = 2018687061
 
+    # let's hash "hey guys"
+    let (hash) = sha256(new ('hey ', 'guys'), 64)
+    let a = hash[0]
+    assert a = 3196269849
+    let b = hash[1]
+    assert b = 935960894
+    let c = hash[2]
+    assert c = 219027118
+    let d = hash[3]
+    assert d = 2548975249
+    let e = hash[4]
+    assert e = 1584991481
+    let f = hash[5]
+    assert f = 2782224291
+    let g = hash[6]
+    assert g = 385959225
+    let h = hash[7]
+    assert h = 10428673
+
     return ()
 end
 

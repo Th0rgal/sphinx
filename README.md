@@ -107,3 +107,87 @@ func test_my_var{syscall_ptr : felt*, range_check_ptr, pedersen_ptr : HashBuilti
     return ()
 end
 ```
+
+## SHA256
+This file depends on bits.cairo. It allows to calculate the sha256 hash of an input of any size in bits.
+For example, sha256("hey guys") = "be83351937c9a13e0d0e16ae97ee46915e790cf9a5d55fa317014539009f2101"
+Which if broken down into 32-bit words, gives :
+- 3196269849
+- 935960894
+- 219027118
+- 2548975249
+- 1584991481
+- 2782224291
+- 385959225
+- 10428673
+
+```cairo
+@view
+func test_sha256{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
+
+    # let's hash "hey guys"
+    let (hash) = sha256(new ('hey ', 'guys'), 64)
+    let a = hash[0]
+    assert a = 3196269849
+    let b = hash[1]
+    assert b = 935960894
+    let c = hash[2]
+    assert c = 219027118
+    let d = hash[3]
+    assert d = 2548975249
+    let e = hash[4]
+    assert e = 1584991481
+    let f = hash[5]
+    assert f = 2782224291
+    let g = hash[6]
+    assert g = 385959225
+    let h = hash[7]
+    assert h = 10428673
+
+    return ()
+end
+```
+
+## Bits manipulation
+This file allows to represent long lists of bits and to perform common operations on them. This list will be represented by a list of words (felts) each containing up to 32 bits, and a felt containing the total number of bits.
+
+### Bits.extract
+Write len bits from input to output, starting at start.
+```cairo
+@view
+func test_extract{range_check_ptr}():
+    alloc_locals
+    let (input) = alloc()
+    # 01001000011001010110110001101100
+    assert input[0] = 1214606444
+    # 01101111001000000111011101101111
+    assert input[1] = 1864398703
+    # 01110010011011000110010000000000
+    assert input[2] = 1919706112
+
+    # two words, no shift, len = two words
+    let (output) = alloc()
+    Bits.extract(input, 0, 64, output)
+    # 01001000011001010110110001101100
+    assert output[0] = 1214606444
+    # 01101111001000000111011101101111
+    assert output[1] = 1864398703
+
+    return ()
+end
+```
+
+### Bits.merge
+Allows to merge two lists of bits into one.
+
+### Bits.rightshift
+Allows you to apply a binary rightshift to a word.
+
+### Bits.leftshift
+Allows you to apply a binary leftship to a word.
+
+### Bits.rightrotate
+Allows you to shift the bits to the right and return by the left to a word.
+
+### Bits.negate
+Returns the binary negation of a word.
