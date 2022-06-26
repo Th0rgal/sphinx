@@ -38,6 +38,5 @@ func test_example{syscall_ptr : felt*, range_check_ptr, pedersen_ptr : HashBuilt
     Storage.write(example.addr, 1, new (12345), 'hello')
     let (result) = example.read(12345)
     assert result = 'hello'
-
     return ()
 end
