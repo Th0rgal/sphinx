@@ -180,43 +180,38 @@ func compute_compression{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}(
     end
 
     # s1 := (h4 rightrotate 6) xor (h4 rightrotate 11) xor (h4 rightrotate 25)
-    let (a) = Bits.rightrotate(hash[4], 6)
-    let (b) = Bits.rightrotate(hash[4], 11)
-    assert bitwise_ptr[0].x = a
-    assert bitwise_ptr[0].y = b
-    let a = bitwise_ptr[0].x_xor_y
-    let (b) = Bits.rightrotate(hash[4], 25)
-    assert bitwise_ptr[1].x = a
-    assert bitwise_ptr[1].y = b
+
+    # %{ print("d:", ids.d, "p:", ids.p, "r:", ids.r) %}
+
+    let (p, r) = unsigned_div_rem(hash[4], 2 ** 6)
+    assert bitwise_ptr[0].x = (p + r * 2 ** (32 - 6))
+    let (p, r) = unsigned_div_rem(hash[4], 2 ** 11)
+    assert bitwise_ptr[0].y = (p + r * 2 ** (32 - 11))
+    assert bitwise_ptr[1].x = bitwise_ptr[0].x_xor_y
+    let (p, r) = unsigned_div_rem(hash[4], 2 ** 25)
+    assert bitwise_ptr[1].y = (p + r * 2 ** (32 - 25))
     let s1 : felt = bitwise_ptr[1].x_xor_y
 
     # ch := (h4 and h5) xor ((not h4) and h6)
     assert bitwise_ptr[2].x = hash[4]
     assert bitwise_ptr[2].y = hash[5]
-    let a = bitwise_ptr[2].x_and_y
-
-    let hey = hash[4]
-    let hello = 4294967295 - hash[4]
     assert bitwise_ptr[3].x = 4294967295 - hash[4]
-
     assert bitwise_ptr[3].y = hash[6]
-    let b = bitwise_ptr[3].x_and_y
-    assert bitwise_ptr[4].x = a
-    assert bitwise_ptr[4].y = b
+    assert bitwise_ptr[4].x = bitwise_ptr[2].x_and_y
+    assert bitwise_ptr[4].y = bitwise_ptr[3].x_and_y
     let ch : felt = bitwise_ptr[4].x_xor_y
 
     # temp1 := hash[7] + s1 + ch + k[i] + w[i]
-    let temp1 : felt = hash[7] + s1 + ch + k[index] + w[index]
+    local temp1 : felt = hash[7] + s1 + ch + k[index] + w[index]
 
     # s0 := (hash[0] rightrotate 2) xor (hash[0] rightrotate 13) xor (a rightrotate 22)
-    let (a) = Bits.rightrotate(hash[0], 2)
-    let (b) = Bits.rightrotate(hash[0], 13)
-    assert bitwise_ptr[5].x = a
-    assert bitwise_ptr[5].y = b
-    let a = bitwise_ptr[5].x_xor_y
-    let (b) = Bits.rightrotate(hash[0], 22)
-    assert bitwise_ptr[6].x = a
-    assert bitwise_ptr[6].y = b
+    let (p, r) = unsigned_div_rem(hash[0], 2 ** 2)
+    assert bitwise_ptr[5].x = p + r * 2 ** (32 - 2)
+    let (p, r) = unsigned_div_rem(hash[0], 2 ** 13)
+    assert bitwise_ptr[5].y = p + r * 2 ** (32 - 13)
+    assert bitwise_ptr[6].x = bitwise_ptr[5].x_xor_y
+    let (p, r) = unsigned_div_rem(hash[0], 2 ** 22)
+    assert bitwise_ptr[6].y = p + r * 2 ** (32 - 22)
     let s0 : felt = bitwise_ptr[6].x_xor_y
 
     # maj := (hash[0] and hash[1]) xor (hash[0] and hash[2]) xor (hash[1] and hash[2])
