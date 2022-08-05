@@ -214,6 +214,81 @@ func test_sha256{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
     return ()
 end
 
+@view
+func test_sha256_client_data{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
+    alloc_locals
+
+    let (client_data_json) = alloc()
+    assert client_data_json[0] = 2065855609
+    assert client_data_json[1] = 1885676090
+    assert client_data_json[2] = 578250082
+    assert client_data_json[3] = 1635087464
+    assert client_data_json[4] = 1848534885
+    assert client_data_json[5] = 1948396578
+    assert client_data_json[6] = 1667785068
+    assert client_data_json[7] = 1818586727
+    assert client_data_json[8] = 1696741922
+    assert client_data_json[9] = 813183028
+    assert client_data_json[10] = 879047521
+    assert client_data_json[11] = 1684224052
+    assert client_data_json[12] = 895825200
+    assert client_data_json[13] = 828518449
+    assert client_data_json[14] = 1664497968
+    assert client_data_json[15] = 878994482
+    assert client_data_json[16] = 1647338340
+    assert client_data_json[17] = 811872312
+    assert client_data_json[18] = 878862896
+    assert client_data_json[19] = 825373744
+    assert client_data_json[20] = 959854180
+    assert client_data_json[21] = 859398963
+    assert client_data_json[22] = 825636148
+    assert client_data_json[23] = 942761062
+    assert client_data_json[24] = 1667327286
+    assert client_data_json[25] = 896999980
+    assert client_data_json[26] = 577729129
+    assert client_data_json[27] = 1734962722
+    assert client_data_json[28] = 975333492
+    assert client_data_json[29] = 1953526586
+    assert client_data_json[30] = 791634799
+    assert client_data_json[31] = 1853125231
+    assert client_data_json[32] = 1819043186
+    assert client_data_json[33] = 761606451
+    assert client_data_json[34] = 1886665079
+    assert client_data_json[35] = 2004233840
+    assert client_data_json[36] = 1919252073
+    assert client_data_json[37] = 1702309475
+    assert client_data_json[38] = 1634890866
+    assert client_data_json[39] = 1768187749
+    assert client_data_json[40] = 778528546
+    assert client_data_json[41] = 740451186
+    assert client_data_json[42] = 1869837135
+    assert client_data_json[43] = 1919510377
+    assert client_data_json[44] = 1847736934
+    assert client_data_json[45] = 1634497381
+    assert client_data_json[46] = 2097152000
+
+    let (hash) = sha256(client_data_json, 1504)
+
+    let a = hash[0]
+    assert a = 0x08ad1974
+    let b = hash[1]
+    assert b = 0x216096a7
+    let c = hash[2]
+    assert c = 0x6ff36a54
+    let d = hash[3]
+    assert d = 0x159891a3
+    let e = hash[4]
+    assert e = 0x57d21a90
+    let f = hash[5]
+    assert f = 0x2c358e6f
+    let g = hash[6]
+    assert g = 0xeb02f14c
+    let h = hash[7]
+    assert h = 0xcaf48fcd
+
+    return ()
+end
+
 func multiple_asserts{range_check_ptr}(ptr : felt*, amount : felt, value : felt):
     if amount == 0:
         return ()
